@@ -1,0 +1,138 @@
+{% extends 'base/index.html' %}
+{% load static %}
+{% block content %}
+  <style>
+    .custom-link {
+      background-color: rgb(180, 180, 15);
+      color: #000;
+      transition: background-color 0.3s ease;
+      border-radius: 10px;
+      .bi{
+        color: aliceblue;
+        font-size: 25px;
+      }
+    }
+    .custom-link:hover {
+      background-color: rgb(160, 160, 15); /* Slightly darker on hover */
+    }
+    
+    .circle-bottom-left {
+    width: 600px; /* Diameter of the circle */
+    height: 500px;
+    background-color: rgb(90, 180, 250);
+    border-radius: 50%; /* Makes the shape a circle */
+    position: fixed; /* Stays fixed at the bottom left */
+    bottom: -100px; /* 20px from the bottom */
+    left: 400px; /* 20px from the left */
+    z-index: -1; /* Ensures the circle appears on top */
+}
+
+
+.circle-center {
+    width: 300px; 
+    height: 300px;
+    background-color: rgb(90, 180, 250);
+    border-radius: 50%; 
+    position: fixed;
+    bottom: 50; 
+    right: 50; 
+    z-index: -100; 
+}
+
+.custom-image{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+    img{
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+    }
+}
+
+.custom-link .bi {
+    color: white; /* Make icons white */
+}
+
+
+.round-checkbox {
+      position: relative;
+      width: 20px; /* Size of the checkbox */
+      height: 20px;
+      margin-right: 10px; /* Spacing between checkbox and image */
+    }
+    .round-checkbox input[type="checkbox"] {
+      opacity: 0; /* Hide the default checkbox */
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      z-index: 1;
+    }
+    /* Custom round checkbox design */
+    .round-checkbox label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      border: 2px solid rgb(200, 200, 15); /* Border color */
+      border-radius: 50%; /* Make it round */
+      cursor: pointer;
+    }
+    /* Style for checked state */
+    .round-checkbox input[type="checkbox"]:checked + label {
+      background-color: #0d6efd; /* Bootstrap primary color */
+      border-color: #0d6efd;
+    }
+    /* Inner dot for checked state */
+    .round-checkbox input[type="checkbox"]:checked + label::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px; /* Size of the inner dot */
+      height: 10px;
+      background-color: rgb(250, 250, 15); /* Color of the inner dot */
+      border-radius: 50%; /* Make it round */
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="container d-flex justify-content-center align-items-center">
+    <div class="card w-100" style="max-width: 800px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);">
+      <!-- Card Header -->
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="fs-5 fw-bold" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">Presidential Seat</div> <!-- Seat they are running for -->
+        <i class="bi bi-arrow-clockwise fs-5" style="cursor: pointer;"></i> <!-- Refresh Icon -->
+      </div>
+
+      <!-- Competitor 1 -->
+      {% for candidate in candidates %}
+        <div class="card-body d-flex align-items-center border-bottom">
+          <div class="round-checkbox">
+              <input type="checkbox" id="checkbox1"> <!-- Round Checkbox -->
+              <label for="checkbox1"></label>
+            </div>
+          <img src="{{candidate.imageURL}}" alt="Competitor 1" class="rounded-circle me-3" style="width: 100px; height: 100px; object-fit: cover;"> <!-- Competitor Picture -->
+          <div class="flex-grow-1">
+            <h5 class="card-title mb-1" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{candidate.name}}</h5> <!-- Competitor Name -->
+            <p class="card-text text-muted mb-0" style="font-family: 'Times New Roman', Times, serif;">{{candidate.bio}}</p> <!-- Competitor Bio -->
+          </div>
+        </div>
+      {% endfor %}
+
+      
+    </div>
+  </div>
+
+
+
+    <div class="circle-bottom-left"></div>
+    
+    <div class="circle-center"></div>
+
+{% endblock %}
