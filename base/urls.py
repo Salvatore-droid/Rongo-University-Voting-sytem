@@ -9,4 +9,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('vote/', views.vote, name='vote'),
     path('voted/', views.voted, name='voted'),
+    path('review/', views.review, name='review'),
+    path('positions-list/', views.positions_list, name='positions_list'),
+    path('position-details/<int:position_id>/', views.position_details, name='position_details'),  # New URL pattern
 ]
+

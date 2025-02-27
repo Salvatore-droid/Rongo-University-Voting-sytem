@@ -75,6 +75,13 @@ def logout_view(request):
     return redirect('login_view')
 
 def voted(request):
+    voter = Voter.objects.filter(user=request.user).first()
+    if voter.candidate is None:
+        messages.error(request, 'Select candidate to vote for')
+        return redirect('vote')
+    else:
+        messages.success(request, "Your votes have been submitted successfully!")
+        
     return render(request, 'base/voted.html')
 
 
@@ -102,7 +109,6 @@ def vote(request):
                 # Create a new vote
                 Vote.objects.create(voter=voter, position=position, candidate=candidate)
 
-        messages.success(request, "Your votes have been submitted successfully!")
         return redirect('voted')
 
     # Fetch all positions and their candidates
@@ -111,11 +117,28 @@ def vote(request):
     return render(request, 'base/vote.html', context)
 
 
+def review(request):
+    voter = Voter.objects.filter(user=request.user).first()
+    votes = Vote.objects.filter(voter=voter).select_related('position', 'candidate')
+    context = {'votes': votes}
+    return render(request, 'base/review.html', context)
+
+
+def positions_list(request):
+    # Fetch all positions
+    positions = Position.objects.all()
+    context = {'positions': positions}
+    return render(request, 'base/seats.html', context)
 
 
 
 
-
+def position_details(request, position_id):
+    # Fetch the position and its candidates
+    position = get_object_or_404(Position, id=position_id)
+    candidates = position.candidates.all()
+    context = {'position': position, 'candidates': candidates}
+    return render(request, 'base/position_details.html', context)
 
 
 
