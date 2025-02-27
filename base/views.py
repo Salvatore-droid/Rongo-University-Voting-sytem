@@ -1,11 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from .models import Voter, Candidate
+from .models import Candidate, Position, Voter, Vote
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView, FormView
-from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
+
+
 
 
 # Create your views here.
@@ -61,6 +60,8 @@ def register(request):
 
         user = User.objects.create_user(username=username, email=email, password=password1)
         user.save()
+
+        Voter.objects.create(user=user)
         
         messages.success(request, "Account created successfully. Please log in.")
         return redirect("login_view")
@@ -73,7 +74,148 @@ def logout_view(request):
     messages.success(request, "You have been logged out.")
     return redirect('login_view')
 
-def voting_view(request):
-    candidates = Candidate.objects.all()
-    context = {'candidates':candidates}
+def voted(request):
+    return render(request, 'base/voted.html')
+
+
+
+def vote(request):
+    if request.method == 'POST':
+        # Get the voter or create one if they don't exist
+        voter, created = Voter.objects.get_or_create(user=request.user)
+
+        # Iterate through the POST data to find selected candidates for each position
+        for key, value in request.POST.items():
+            if key.startswith('position_'):
+                position_id = key.split('_')[1]  # Extract position ID from the key
+                candidate_id = value  # Selected candidate ID
+
+                # Ensure the candidate and position exist
+                position = get_object_or_404(Position, id=position_id)
+                candidate = get_object_or_404(Candidate, id=candidate_id)
+
+                # Check if the voter has already voted for this position
+                if Vote.objects.filter(voter=voter, position=position).exists():
+                    messages.error(request, f"You have already voted.")
+                    return redirect('vote')
+
+                # Create a new vote
+                Vote.objects.create(voter=voter, position=position, candidate=candidate)
+
+        messages.success(request, "Your votes have been submitted successfully!")
+        return redirect('voted')
+
+    # Fetch all positions and their candidates
+    positions = Position.objects.prefetch_related('candidates').all()
+    context = {'positions': positions}
     return render(request, 'base/vote.html', context)
+
+
+
+
+
+
+
+
+
+
+
+# def vote(request):
+#     if request.method == 'POST':
+        
+#         position_id = request.POST.get('position')
+#         candidate_id = request.POST.get('candidate')
+
+#         if not position_id or not candidate_id:
+#             messages.error(request, "Please select a candidate for the position.")
+#             return redirect('vote')
+
+        
+#         voter = Voter.objects.filter(user=request.user).first()
+#         if not voter:
+#             voter = Voter.objects.create(user=request.user)
+
+        
+#         if Vote.objects.filter(voter=voter, position_id=position_id).exists():
+#             messages.error(request, "You have already voted for this position.")
+#             return redirect('vote')
+
+        
+#         position = get_object_or_404(Position, id=position_id)
+#         candidate = get_object_or_404(Candidate, id=candidate_id)
+#         Vote.objects.create(voter=voter, position=position, candidate=candidate)
+
+#         messages.success(request, f"Vote for {position.name} submitted successfully!")
+#         return redirect('voted')
+
+    
+#     positions = Position.objects.prefetch_related('candidates').all()
+#     context = {'positions': positions}
+#     return render(request, 'base/vote.html', context)
+
+
+
+
+
+
+
+
+
+
+# def vote(request):
+#     if request.method == 'POST':
+#         candidate_id = request.POST.get('candidate')
+#         if not candidate_id:
+#             messages.error(request, "No candidate selected.")
+#             return redirect('vote')
+
+#         position = get_object_or_404(Candidate, id=candidate_id)
+#         voter, created = Voter.objects.get_or_create(user=request.user)
+        
+        
+#         if voter.candidate:
+#             messages.error(request, "You have already voted.")
+#             return redirect('vote')
+        
+        
+#         voter.position = position
+#         voter.save()
+        
+#         messages.success(request, "Vote submitted successfully!")
+#         return redirect('voted')  
+
+#     candidates = Candidate.objects.all()
+#     positions = Position.objects.all()
+#     context = {'candidates': candidates, 'positions':positions}
+#     return render(request, 'base/vote.html', context)
+
+
+# def vote(request):
+#     if request.method == 'POST':
+#         president_id = request.POST.get('president')
+#         vice_president_id = request.POST.get('vice_president')
+        
+#         if president_id:
+#             president = Candidate.objects.get(id=president_id)
+            
+#             voter = Voter.objects.get(user=request.user)
+#             voter.selected_president = president
+#             voter.save()
+        
+#         if vice_president_id:
+#             vice_president = Candidate.objects.get(id=vice_president_id)
+            
+#             voter = Voter.objects.get(user=request.user)
+#             voter.selected_vice_president = vice_president
+#             voter.save()
+
+#         if voter.candidate:
+#             messages.error(request, "You have already voted.")
+#             return redirect('vote')
+        
+#         messages.success(request, "Vote submitted successfully!")
+#         return redirect('voted')  
+
+#     candidates = Candidate.objects.all()
+#     context = {'candidates': candidates}
+#     return render(request, 'base/vote.html', context)
