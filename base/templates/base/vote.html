@@ -121,18 +121,22 @@
               <span class="text-white">Refresh</span> 
             </div>
           </div>
-          <div class="card-body d-flex align-items-center border-bottom">
-            {% for candidate in position.candidates.all %}
-              <div class="round-checkbox">
-                <input  type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" id="candidate_{{ candidate.id }}">
-                <label  for="candidate_{{ candidate.id }}"></label>
-              </div>
-              <img src="{{ candidate.imageURL }}" alt="{{ candidate.name }}" class="rounded-circle me-3" style="width: 100px; height: 100px; object-fit: cover;">
-              <div class="flex-grow-1">
-                <h5 class="card-title mb-1" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ candidate.name }}</h5> 
-                <p class="card-text text-muted mb-0" style="font-family: 'Times New Roman', Times, serif;">{{ candidate.bio }}</p> 
-              </div>
-            {% endfor %}
+          <div class="card-body">
+            <div class="d-flex flex-column gap-3"> <!-- Stack candidates vertically -->
+              {% for candidate in position.candidates.all %}
+                <div class="d-flex align-items-center"> <!-- Keep candidate details in a row -->
+                  <div class="round-checkbox">
+                    <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" id="candidate_{{ candidate.id }}">
+                    <label for="candidate_{{ candidate.id }}"></label>
+                  </div>
+                  <img src="{{ candidate.imageURL }}" alt="{{ candidate.name }}" class="rounded-circle me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                  <div class="flex-grow-1">
+                    <h5 class="card-title mb-1" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ candidate.name }}</h5> 
+                    <p class="card-text text-muted mb-0" style="font-family: 'Times New Roman', Times, serif;">{{ candidate.bio }}</p> 
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
           </div>
         </div>
       {% endfor %}
