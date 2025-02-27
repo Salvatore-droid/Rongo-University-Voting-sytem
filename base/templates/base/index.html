@@ -85,7 +85,7 @@
         <span style="margin-left: 200px; color: rgb(3, 3, 68); font-family: 'Times New Roman', Times, serif;" class="fs-4">RU-Voting</span>
       </a>
 
-      <h4 style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; margin-right: 100px;"><span style="color: #000;">User:</span> {{ request.user }}</h4>
+      <h4 style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; margin-right: 100px;"><span style="color: #000;"><img src="{% static 'images/default.png' %}" style="width:50px; height:50px; object-fit:cover;" alt=""></span> {{ request.user }}</h4>
       <!-- Login Button -->
       <a href="{% url 'logout_view' %}" class="btn btn-primary" style="padding: 10px 30px;margin-right: 20px;">Logout</a>
     </div>

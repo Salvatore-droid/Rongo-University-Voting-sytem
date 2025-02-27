@@ -3,11 +3,13 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from .models import Candidate, Position, Voter, Vote
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 
 
 
 # Create your views here.
+@login_required(login_url='login_view')
 def home(request):
     return render(request, 'base/home.html')
 
@@ -74,18 +76,13 @@ def logout_view(request):
     messages.success(request, "You have been logged out.")
     return redirect('login_view')
 
+
+@login_required(login_url='login_view')
 def voted(request):
-    voter = Voter.objects.filter(user=request.user).first()
-    if voter.candidate is None:
-        messages.error(request, 'Select candidate to vote for')
-        return redirect('vote')
-    else:
-        messages.success(request, "Your votes have been submitted successfully!")
-        
     return render(request, 'base/voted.html')
 
 
-
+@login_required(login_url='login_view')
 def vote(request):
     if request.method == 'POST':
         # Get the voter or create one if they don't exist
@@ -109,6 +106,7 @@ def vote(request):
                 # Create a new vote
                 Vote.objects.create(voter=voter, position=position, candidate=candidate)
 
+        messages.error(request, "Your votes have been submitted successfully!")
         return redirect('voted')
 
     # Fetch all positions and their candidates
@@ -116,14 +114,14 @@ def vote(request):
     context = {'positions': positions}
     return render(request, 'base/vote.html', context)
 
-
+@login_required(login_url='login_view')
 def review(request):
     voter = Voter.objects.filter(user=request.user).first()
     votes = Vote.objects.filter(voter=voter).select_related('position', 'candidate')
     context = {'votes': votes}
     return render(request, 'base/review.html', context)
 
-
+@login_required(login_url='login_view')
 def positions_list(request):
     # Fetch all positions
     positions = Position.objects.all()
@@ -132,7 +130,7 @@ def positions_list(request):
 
 
 
-
+@login_required(login_url='login_view')
 def position_details(request, position_id):
     # Fetch the position and its candidates
     position = get_object_or_404(Position, id=position_id)
