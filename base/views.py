@@ -140,6 +140,31 @@ def position_details(request, position_id):
 
 
 
+def voting_status(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('userId')
+        
+        try:
+            # Check if the user exists in the Voter model
+            voter = Voter.objects.get(user__id=user_id)
+            
+            # Check if the user has voted for any position
+            has_voted = Vote.objects.filter(voter=voter).exists()
+            
+            if has_voted:
+                status = "Voted"
+            else:
+                status = "Not Voted"
+        except Voter.DoesNotExist:
+            # If the user does not exist, they haven't voted
+            status = "Not Voted"
+        
+        return render(request, 'base/status.html', {'status': status, 'user_id': user_id})
+    
+    return render(request, 'base/status.html')
+
+
+
 
 # def vote(request):
 #     if request.method == 'POST':

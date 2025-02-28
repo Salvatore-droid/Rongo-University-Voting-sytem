@@ -7,10 +7,6 @@
       color: #000;
       transition: background-color 0.3s ease;
       border-radius: 10px;
-      .bi{
-        color: aliceblue;
-        font-size: 25px;
-      }
     }
     .custom-link:hover {
       background-color: rgb(160, 160, 15); /* Slightly darker on hover */
@@ -42,11 +38,11 @@
       display: flex;
       flex-direction: row;
       gap: 50px;
-      img {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-      }
+    }
+    .custom-image img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
     }
 
     .custom-link .bi {
@@ -99,8 +95,7 @@
   </style>
 </head>
 <body>
-  
-  <div class="container d-flex justify-content-center flex-column align-items-center">
+  <div class="container">
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -109,42 +104,47 @@
         </div>
       {% endfor %}
     {% endif %}
-    <form id="voteForm" method="POST" action="{% url 'vote' %}">
-      {% csrf_token %}
-      {% for position in positions %}
-        <div class="card mb-4 w-100" style="max-width: 1200px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <div class="fs-5 fw-bold" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ position.name }}</div>
 
-            <div class="d-flex align-items-center gap-2" style="cursor: pointer; background-color: #0d6efd; padding: 5px 15px; border-radius: 5px;" onclick="refreshSelection('{{ position.id }}')">
-              <i class="bi bi-arrow-clockwise fs-5 text-white"></i> 
-              <span class="text-white">Refresh</span> 
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="d-flex flex-column gap-3"> <!-- Stack candidates vertically -->
-              {% for candidate in position.candidates.all %}
-                <div class="d-flex align-items-center"> <!-- Keep candidate details in a row -->
-                  <div class="round-checkbox">
-                    <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" id="candidate_{{ candidate.id }}" required>
-                    <label for="candidate_{{ candidate.id }}"></label>
-                  </div>
-                  <img src="{{ candidate.imageURL }}" alt="{{ candidate.name }}" class="rounded-circle me-3" style="width: 100px; height: 100px; object-fit: cover;">
-                  <div class="flex-grow-1">
-                    <h5 class="card-title mb-1" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ candidate.name }}</h5> 
-                    <p class="card-text text-muted mb-0" style="font-family: 'Times New Roman', Times, serif;">{{ candidate.bio }}</p> 
-                  </div>
+    <!-- Use Bootstrap grid to control card width -->
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10 col-sm-12"> <!-- Adjust column width for different screen sizes -->
+        <form id="voteForm" method="POST" action="{% url 'vote' %}">
+          {% csrf_token %}
+          {% for position in positions %}
+            <div class="card mb-4 w-100" style="box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="fs-5 fw-bold" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ position.name }}</div>
+
+                <div class="d-flex align-items-center gap-2" style="cursor: pointer; background-color: #0d6efd; padding: 5px 15px; border-radius: 5px;" onclick="refreshSelection('{{ position.id }}')">
+                  <i class="bi bi-arrow-clockwise fs-5 text-white"></i> 
+                  <span class="text-white">Refresh</span> 
                 </div>
-              {% endfor %}
+              </div>
+              <div class="card-body">
+                <div class="d-flex flex-column gap-3"> <!-- Stack candidates vertically -->
+                  {% for candidate in position.candidates.all %}
+                    <div class="d-flex align-items-center"> <!-- Keep candidate details in a row -->
+                      <div class="round-checkbox">
+                        <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" id="candidate_{{ candidate.id }}" required>
+                        <label for="candidate_{{ candidate.id }}"></label>
+                      </div>
+                      <img src="{{ candidate.imageURL }}" alt="{{ candidate.name }}" class="rounded-circle me-3" style="width: 100px; height: 100px; object-fit: cover;">
+                      <div class="flex-grow-1">
+                        <h5 class="card-title mb-1" style="font-family: 'Times New Roman', Times, serif; font-style: italic;color: rgb(0, 140, 255);">{{ candidate.name }}</h5> 
+                        <p class="card-text text-muted mb-0" style="font-family: 'Times New Roman', Times, serif;">{{ candidate.bio }}</p> 
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
             </div>
+          {% endfor %}
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Submit Vote</button>
           </div>
-        </div>
-      {% endfor %}
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary btn-lg">Submit Vote</button>
+        </form>
       </div>
-    </form>
-
+    </div>
   </div>
 
   <div class="circle-bottom-left"></div>
