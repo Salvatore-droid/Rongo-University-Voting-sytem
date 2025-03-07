@@ -42,6 +42,22 @@
       .custom-link .bi {
         color: white;
       }
+      /* Footer Styles */
+      .footer {
+        background-color: #f8f9fa;
+        border-top: 2px solid rgb(160, 160, 15);
+        padding: 20px 0;
+        text-align: center;
+        font-family: 'Times New Roman', Times, serif;
+        color: rgb(3, 3, 68);
+      }
+      .footer a {
+        color: rgb(0, 140, 255);
+        text-decoration: none;
+      }
+      .footer a:hover {
+        color: rgb(160, 160, 15);
+      }
     </style>
   </head>
   <body class="d-flex flex-column vh-100 overflow-hidden">
@@ -107,6 +123,15 @@
       {% endblock %}
     </div>
 
+    <!-- Footer -->
+    <footer class="footer mt-auto">
+      <div class="container">
+        <p class="mb-0">© 2023 Rongo Voting System. All rights reserved.</p>
+        <p class="mb-0">
+          <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+        </p>
+      </div>
+    </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
