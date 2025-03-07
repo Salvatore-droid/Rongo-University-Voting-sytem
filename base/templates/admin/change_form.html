@@ -1,0 +1,14 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Edit {{ opts.verbose_name|capfirst }}</h2>
+        </div>
+    </div>
+
+    <!-- Default Change Form Content -->
+    {{ block.super }}
+</div>
+{% endblock %}

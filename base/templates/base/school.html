@@ -1,0 +1,215 @@
+{% extends 'base/index.html' %}
+{% load static %}
+{% block content %}
+  <style>
+    .school-card {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .school-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    .school-card.selected {
+      border-color: #0d6efd;
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    .alert {
+      display: none; /* Hide alerts by default */
+    }
+  </style>
+    
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white text-center">
+            <h3 class="card-title mb-0">Select Your School</h3>
+          </div>
+          <div class="card-body">
+            <p class="text-muted text-center">
+              Please select the school you are registered in based on your registration number.
+            </p>
+            <form method="POST" action="{% url 'school_selection' %}">
+              {% csrf_token %}
+              <div class="row g-4">
+                {% for school in schools %}
+                  <div class="col-md-4">
+                    <div class="card school-card text-center p-4" onclick="selectSchool('{{ school.id }}')">
+                      <i class="bi bi-building fs-1 text-primary"></i>
+                      <h5 class="mt-3">{{ school.name }}</h5>
+                      <p class="text-muted">For students with registration numbers like {{ school.registration_formats }}</p>
+                      <input type="radio" name="school" value="{{ school.id }}" id="school_{{ school.id }}" style="display: none;">
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+              <!-- Validation Alert -->
+              <div class="alert alert-danger mt-4 text-center" id="invalidSchoolAlert">
+                You are not registered in the selected school. Please choose a different school.
+              </div>
+              <!-- Proceed Button -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Proceed</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectSchool(schoolId) {
+      // Set the selected radio button
+      document.getElementById(`school_${schoolId}`).checked = true;
+
+      // Remove selected class from all cards
+      document.querySelectorAll('.school-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      // Add selected class to the clicked card
+      event.currentTarget.classList.add('selected');
+
+      // Hide the alert
+      document.getElementById('invalidSchoolAlert').style.display = 'none';
+    }
+  </script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %}
+
+<!-- {% extends 'base/index.html' %}
+{% load static %}
+{% block content %}
+  <style>
+    .school-card {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .school-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    .school-card.selected {
+      border-color: #0d6efd;
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    .alert {
+      display: none; 
+    }
+  </style>
+  {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+  {% endif %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white text-center">
+            <h3 class="card-title mb-0">Select Your School</h3>
+          </div>
+          <div class="card-body">
+            <p class="text-muted text-center">
+              Please select the school you are registered in based on your registration number.
+            </p>
+            <form method="POST" action="{% url 'school_selection' %}">
+              {% csrf_token %}
+              <div class="row g-4">
+                
+                <div class="col-md-4">
+                  <div class="card school-card text-center p-4" onclick="selectSchool('science')">
+                    <i class="bi bi-flask fs-1 text-primary"></i>
+                    <h5 class="mt-3">School of Science</h5>
+                    <p class="text-muted">For students with registration numbers like CSC/123/2023, MAT/456/2023, AGR/789/2023</p>
+                    <input type="radio" name="school" value="science" id="science" style="display: none;">
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="card school-card text-center p-4" onclick="selectSchool('business')">
+                    <i class="bi bi-briefcase fs-1 text-success"></i>
+                    <h5 class="mt-3">School of Business</h5>
+                    <p class="text-muted">For students with registration numbers like BUS/123/2023, ACC/456/2023, MGT/789/2023</p>
+                    <input type="radio" name="school" value="business" id="business" style="display: none;">
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="card school-card text-center p-4" onclick="selectSchool('informatics')">
+                    <i class="bi bi-laptop fs-1 text-info"></i>
+                    <h5 class="mt-3">School of Informatics</h5>
+                    <p class="text-muted">For students with registration numbers like INF/123/2023, ICT/456/2023, SWE/789/2023</p>
+                    <input type="radio" name="school" value="informatics" id="informatics" style="display: none;">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="alert alert-danger mt-4 text-center" id="invalidSchoolAlert">
+                You are not registered in the selected school. Please choose a different school.
+              </div>
+              
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Proceed</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function selectSchool(school) {
+      
+      document.getElementById(school).checked = true;
+
+      
+      document.querySelectorAll('.school-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+
+      
+      event.currentTarget.classList.add('selected');
+
+      
+      document.getElementById('invalidSchoolAlert').style.display = 'none';
+    }
+  </script>
+{% endblock %}
+
+
+
+
+
+ -->
+{% endcomment %}

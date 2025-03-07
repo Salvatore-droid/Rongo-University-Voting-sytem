@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from .models import Candidate, Position, Voter, Vote
+from .models import Candidate, Position, Voter, Vote, School
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db import models
+
 
 
 
@@ -27,7 +30,7 @@ def login_view(request):
         elif user:
             login(request, user)
             messages.success(request, 'Login successful')
-            return redirect('home')
+            return redirect('school_selection')
         else:
             messages.error(request, 'Invalid username or password')
             return redirect('login_view')
@@ -82,12 +85,18 @@ def voted(request):
     return render(request, 'base/voted.html')
 
 
+
+
+
 @login_required(login_url='login_view')
 def vote(request):
-    if request.method == 'POST':
-        # Get the voter or create one if they don't exist
-        voter, created = Voter.objects.get_or_create(user=request.user)
+    # Get the voter's selected school
+    voter = Voter.objects.filter(user=request.user).first()
+    if not voter or not voter.school:
+        messages.error(request, "You must select a school before voting.")
+        return redirect('school_selection')
 
+    if request.method == 'POST':
         # Iterate through the POST data to find selected candidates for each position
         for key, value in request.POST.items():
             if key.startswith('position_'):
@@ -106,13 +115,67 @@ def vote(request):
                 # Create a new vote
                 Vote.objects.create(voter=voter, position=position, candidate=candidate)
 
-        messages.error(request, "Your votes have been submitted successfully!")
+        messages.success(request, "Your votes have been submitted successfully!")
         return redirect('voted')
 
-    # Fetch all positions and their candidates
-    positions = Position.objects.prefetch_related('candidates').all()
-    context = {'positions': positions}
+    # Fetch all positions and their candidates, filtered by the voter's school
+    positions = Position.objects.prefetch_related(
+        models.Prefetch('candidates', queryset=Candidate.objects.filter(school=voter.school))
+    ).all()
+    context = {
+        'positions': positions,
+        'voter': voter,  # Pass the voter object to the template
+    }
     return render(request, 'base/vote.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @login_required(login_url='login_view')
+# def vote(request):
+#     if request.method == 'POST':
+        
+#         voter, created = Voter.objects.get_or_create(user=request.user)
+
+        
+#         for key, value in request.POST.items():
+#             if key.startswith('position_'):
+#                 position_id = key.split('_')[1]  
+#                 candidate_id = value 
+
+                
+#                 position = get_object_or_404(Position, id=position_id)
+#                 candidate = get_object_or_404(Candidate, id=candidate_id)
+
+                
+#                 if Vote.objects.filter(voter=voter, position=position).exists():
+#                     messages.error(request, f"You have already voted.")
+#                     return redirect('vote')
+
+                
+#                 Vote.objects.create(voter=voter, position=position, candidate=candidate)
+
+#         messages.error(request, "Your votes have been submitted successfully!")
+#         return redirect('voted')
+
+    
+#     positions = Position.objects.prefetch_related('candidates').all()
+#     context = {'positions': positions}
+#     return render(request, 'base/vote.html', context)
 
 @login_required(login_url='login_view')
 def review(request):
@@ -139,14 +202,17 @@ def position_details(request, position_id):
     return render(request, 'base/position_details.html', context)
 
 
-
+@login_required(login_url='login_view')
 def voting_status(request):
     if request.method == 'POST':
-        user_id = request.POST.get('userId')
+        username = request.POST.get('username')
         
         try:
+            # Check if the user exists in the User model
+            user = User.objects.get(username=username)
+            
             # Check if the user exists in the Voter model
-            voter = Voter.objects.get(user__id=user_id)
+            voter = Voter.objects.get(user=user)
             
             # Check if the user has voted for any position
             has_voted = Vote.objects.filter(voter=voter).exists()
@@ -155,113 +221,92 @@ def voting_status(request):
                 status = "Voted"
             else:
                 status = "Not Voted"
-        except Voter.DoesNotExist:
+        except User.DoesNotExist:
             # If the user does not exist, they haven't voted
             status = "Not Voted"
+        except Voter.DoesNotExist:
+            # If the user is not a voter, they haven't voted
+            status = "Not Voted"
         
-        return render(request, 'base/status.html', {'status': status, 'user_id': user_id})
+        return render(request, 'base/status.html', {'status': status, 'username': username})
     
     return render(request, 'base/status.html')
 
 
 
 
-# def vote(request):
+@login_required(login_url='login_view')
+def spoiled_votes(request):
+    # Define spoiled votes
+    spoiled_votes = Vote.objects.filter(
+        models.Q(candidate__isnull=True) |  # Votes with no candidate
+        models.Q(position__isnull=True)     # Votes with no position
+    )
+
+    # Add logic to detect multiple votes by the same voter for the same position
+    # (Optional, depending on your requirements)
+
+    context = {
+        'spoiled_votes': spoiled_votes,
+    }
+    return render(request, 'base/spoiled_votes.html', context)
+
+
+@login_required(login_url='login_view')
+def school_selection(request):
+    if not request.user.is_authenticated:
+        messages.warning(request, "You must be logged in to access this page.")
+        return redirect('login')
+
+    username = request.user.username
+
+    if request.method == 'POST':
+        selected_school_id = request.POST.get('school')
+        selected_school = get_object_or_404(School, id=selected_school_id)
+
+        # Check if the username matches any of the school's registration formats
+        if any(username.startswith(prefix) for prefix in selected_school.get_formats()):
+            # Save the selected school in the Voter model
+            voter, created = Voter.objects.get_or_create(user=request.user)
+            voter.school = selected_school
+            voter.save()
+
+            messages.success(request, f"You have successfully selected the {selected_school.name}.")
+            return redirect('home')
+        else:
+            messages.error(request, "You are not registered in the selected school. Please choose a different school.")
+            return redirect('school_selection')
+
+    schools = School.objects.all()
+    return render(request, 'base/school.html', {'schools': schools})
+
+
+
+
+
+
+
+
+# @login_required(login_url='login_view')
+# def school_selection(request):
+#     if not request.user.is_authenticated:
+#         messages.warning(request, "You must be logged in to access this page.")
+#         return redirect('login')
+
+#     username = request.user.username
+
 #     if request.method == 'POST':
-        
-#         position_id = request.POST.get('position')
-#         candidate_id = request.POST.get('candidate')
-
-#         if not position_id or not candidate_id:
-#             messages.error(request, "Please select a candidate for the position.")
-#             return redirect('vote')
+#         selected_school_id = request.POST.get('school')
+#         selected_school = get_object_or_404(School, id=selected_school_id)
 
         
-#         voter = Voter.objects.filter(user=request.user).first()
-#         if not voter:
-#             voter = Voter.objects.create(user=request.user)
+#         if any(username.startswith(prefix) for prefix in selected_school.get_formats()):
+#             messages.success(request, f"You have successfully selected the {selected_school.name}.")
+#             return redirect('home')
+#         else:
+#             messages.error(request, "You are not registered in the selected school. Please choose a different school.")
+#             return redirect('school_selection')
 
-        
-#         if Vote.objects.filter(voter=voter, position_id=position_id).exists():
-#             messages.error(request, "You have already voted for this position.")
-#             return redirect('vote')
+#     schools = School.objects.all()
+#     return render(request, 'base/school.html', {'schools': schools})
 
-        
-#         position = get_object_or_404(Position, id=position_id)
-#         candidate = get_object_or_404(Candidate, id=candidate_id)
-#         Vote.objects.create(voter=voter, position=position, candidate=candidate)
-
-#         messages.success(request, f"Vote for {position.name} submitted successfully!")
-#         return redirect('voted')
-
-    
-#     positions = Position.objects.prefetch_related('candidates').all()
-#     context = {'positions': positions}
-#     return render(request, 'base/vote.html', context)
-
-
-
-
-
-
-
-
-
-
-# def vote(request):
-#     if request.method == 'POST':
-#         candidate_id = request.POST.get('candidate')
-#         if not candidate_id:
-#             messages.error(request, "No candidate selected.")
-#             return redirect('vote')
-
-#         position = get_object_or_404(Candidate, id=candidate_id)
-#         voter, created = Voter.objects.get_or_create(user=request.user)
-        
-        
-#         if voter.candidate:
-#             messages.error(request, "You have already voted.")
-#             return redirect('vote')
-        
-        
-#         voter.position = position
-#         voter.save()
-        
-#         messages.success(request, "Vote submitted successfully!")
-#         return redirect('voted')  
-
-#     candidates = Candidate.objects.all()
-#     positions = Position.objects.all()
-#     context = {'candidates': candidates, 'positions':positions}
-#     return render(request, 'base/vote.html', context)
-
-
-# def vote(request):
-#     if request.method == 'POST':
-#         president_id = request.POST.get('president')
-#         vice_president_id = request.POST.get('vice_president')
-        
-#         if president_id:
-#             president = Candidate.objects.get(id=president_id)
-            
-#             voter = Voter.objects.get(user=request.user)
-#             voter.selected_president = president
-#             voter.save()
-        
-#         if vice_president_id:
-#             vice_president = Candidate.objects.get(id=vice_president_id)
-            
-#             voter = Voter.objects.get(user=request.user)
-#             voter.selected_vice_president = vice_president
-#             voter.save()
-
-#         if voter.candidate:
-#             messages.error(request, "You have already voted.")
-#             return redirect('vote')
-        
-#         messages.success(request, "Vote submitted successfully!")
-#         return redirect('voted')  
-
-#     candidates = Candidate.objects.all()
-#     context = {'candidates': candidates}
-#     return render(request, 'base/vote.html', context)

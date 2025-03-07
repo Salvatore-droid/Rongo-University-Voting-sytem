@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Welcome to the Vote App Admin Dashboard</h2>
+            <a href="{% url 'voteappadmin:admin-stats' %}" class="btn btn-primary">View Stats</a>
+        </div>
+    </div>
+
+    <!-- Default Admin Content -->
+    {{ block.super }}
+</div>
+{% endblock %}

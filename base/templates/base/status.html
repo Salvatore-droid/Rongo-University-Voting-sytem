@@ -7,7 +7,7 @@
       <h1 class="display-4 fw-bold" style="color: rgb(0, 140, 255); font-family: 'Times New Roman', Times, serif;">
         Voting Status
       </h1>
-      <p class="lead text-muted" style="font-family: 'Times New Roman', Times, serif;">
+      <p class="lead text-muted" style="font-family: 'Times New Roman', Times, serif; font-style:italic;">
         Check your voting status to see if you have already voted.
       </p>
     </div>
@@ -18,16 +18,13 @@
         <div class="card shadow-lg p-4">
           <div class="card-body">
             <form id="statusForm" method="POST" action="{% url 'voting_status' %}">
-                <p class="fs-5" style="font-family: 'Times New Roman', Times, serif;">
-                    Your User ID is: <strong>{{ user_id }}</strong>
-                </p>
               {% csrf_token %}
-              <!-- User ID Input -->
+              <!-- Username Input -->
               <div class="mb-3">
-                <label for="userId" class="form-label fw-bold" style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255);">
-                  Enter Your User ID
+                <label for="username" class="form-label fw-bold" style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255);">
+                  Username
                 </label>
-                <input type="text" class="form-control" id="userId" name="userId" placeholder="e.g., 12345" required>
+                <input type="text" class="form-control" id="username" name="username" placeholder="e.g., john_doe" required>
               </div>
 
               <!-- Submit Button -->

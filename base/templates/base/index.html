@@ -80,7 +80,7 @@
         </a>
 
         <!-- User Info -->
-        <h4 style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; margin-right: 100px;">
+        <h4 style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; margin-right: 100px; font-size: 20px;">
           <span style="color: #000;">
             <img src="{% static 'images/default.png' %}" style="width:50px; height:50px; object-fit:cover;" alt="">
           </span> {{ request.user }}
@@ -108,12 +108,15 @@
         </a>
 
         <!-- Review Link -->
-        <a href="{% url 'review' %}" class="d-block text-decoration-none p-2 border-bottom mb-4 custom-link text-center w-100">
+        <a href="{% url 'review' %}" class="d-block text-decoration-none p-2 border-bottom mb-2 custom-link text-center w-100">
           <i class="bi bi-clipboard-check me-2"></i> Review
+        </a>
+        <a href="{% url 'spoiled_votes' %}" class="d-block text-decoration-none p-2 border-bottom mb-4 custom-link text-center w-100">
+          <i class="bi bi-clipboard-check me-2"></i> Spoiled Votes
         </a>
 
         <!-- Logout Link -->
-        <a href="#" class="d-block text-decoration-none p-2 custom-link text-center w-100">
+        <a href="{% url 'logout_view' %}" class="d-block text-decoration-none p-2 custom-link text-center w-100">
           <i class="bi bi-box-arrow-right me-2"></i> Logout
         </a>
       </div>

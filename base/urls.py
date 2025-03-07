@@ -12,6 +12,8 @@ urlpatterns = [
     path('review/', views.review, name='review'),
     path('positions-list/', views.positions_list, name='positions_list'),
     path('voting-status/', views.voting_status, name='voting_status'),
+    path('spoiled-votes/', views.spoiled_votes, name='spoiled_votes'),
+    path('school-selection/', views.school_selection, name='school_selection'),
     path('position-details/<int:position_id>/', views.position_details, name='position_details'),  # New URL pattern
 ]
 

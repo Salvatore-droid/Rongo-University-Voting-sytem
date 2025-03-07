@@ -1,11 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+
+
+
+
+class School(models.Model):
+    name = models.CharField(max_length=200, null=True)
+    registration_formats = models.TextField(help_text="Comma-separated registration number prefixes (e.g., CSC/,MAT/,AGR/)")
+
+    def __str__(self):
+        return self.name
+
+    def get_formats(self):
+        return self.registration_formats.split(',')
+
+
+        
 # Candidate Model
 class Candidate(models.Model):
     name = models.CharField(max_length=200, null=True)
     image = models.ImageField(null=True, blank=True)
     bio = models.TextField(null=True)
+    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True, related_name='candidates')  # Associate candidate with a school
 
     def __str__(self):
         return self.name
@@ -31,7 +49,7 @@ class Voter(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     votes = models.ManyToManyField('Vote', related_name='voters')  # Track votes for each position
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, null=True)
-
+    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True, related_name='voters')  # Associate voter with a school
 
     def __str__(self):
         return str(self.user)
@@ -46,39 +64,7 @@ class Vote(models.Model):
         return f"{self.voter.user.username} voted for {self.candidate.name} as {self.position.name}"
 
 
+
+
     
     
-
-# from django.db import models
-# from django.contrib.auth.models import User
-
-
-
-# class Candidate(models.Model):
-#     name = models.CharField(max_length=200, null=True)
-#     image = models.ImageField(null=True, blank=True)
-#     bio = models.TextField(null=True)
-
-#     def __str__(self):
-#         return self.name
-
-#     @property
-
-#     def imageURL(self):
-#         try:
-#             url = self.image.url
-#         except:
-#             url = ''
-#         return url
-
-# class Position(models.Model):
-#     position = models.CharField(max_length=200, null=True)
-#     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, null=True, blank=True)
-
-# class Voter(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-#     position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True, blank=True)
-    
-    
-#     def __str__(self):
-#         return self.user.username
