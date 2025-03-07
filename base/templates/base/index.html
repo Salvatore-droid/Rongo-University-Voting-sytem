@@ -72,22 +72,21 @@
         <button class="btn btn-primary me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
           <span class="navbar-toggler-icon"></span>
         </button>
-
+    
         <!-- Logo and Text -->
         <a class="navbar-brand d-flex align-items-center me-auto" href="#">
-          <img src="{% static 'images/Logo.png' %}" alt="Logo" width="300" height="100" class="d-inline-block align-text-top" style="object-fit: cover; margin-left: 200px;">
-          <span style="margin-left: 200px; color: rgb(3, 3, 68); font-family: 'Times New Roman', Times, serif;" class="fs-4">RU-Voting</span>
+          <img src="{% static 'images/Logo.png' %}" alt="Logo" width="300" height="100" class="d-inline-block align-text-top me-4" style="object-fit: cover;"> <!-- Added me-4 for margin-right -->
         </a>
-
+    
         <!-- User Info -->
-        <h4 style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; margin-right: 100px; font-size: 20px;">
+        <h4 class="me-4" style="font-family: 'Times New Roman', Times, serif; color: rgb(0, 140, 255); font-style: italic; font-size: 20px;"> <!-- Added me-4 for margin-right -->
           <span style="color: #000;">
             <img src="{% static 'images/default.png' %}" style="width:50px; height:50px; object-fit:cover;" alt="">
           </span> {{ request.user }}
         </h4>
-
+    
         <!-- Logout Button -->
-        <a href="{% url 'logout_view' %}" class="btn btn-primary" style="padding: 10px 30px;margin-right: 20px;">Logout</a>
+        <a href="{% url 'logout_view' %}" class="btn btn-primary" style="padding: 10px 30px;">Logout</a>
       </div>
     </nav>
 
