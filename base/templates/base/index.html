@@ -9,6 +9,28 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
       /* Retain your custom styles */
+
+    .circle-bottom-left {
+      width: 600px; 
+      height: 500px;
+      background-color: rgb(90, 180, 250);
+      border-radius: 50%; 
+      position: fixed; 
+      bottom: 100px; 
+      left: 400px; 
+      z-index: -100;
+    }
+
+    .circle-center {
+      width: 300px; 
+      height: 300px;
+      background-color: rgb(90, 180, 250);
+      border-radius: 50%; 
+      position: fixed;
+      bottom: 100; 
+      right: 150; 
+      z-index: -100; 
+    }
       .custom-link {
         background-color: rgb(180, 180, 15);
         color: #000;
@@ -26,6 +48,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        background-color: aliceblue;
         box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
       }
       .custom-list-group a {
@@ -62,7 +85,7 @@
   </head>
   <body class="d-flex flex-column vh-100 overflow-hidden">
     <!-- Navbar -->
-    <nav class="navbar navbar-light bg-light py-3" style="border-bottom: 2px solid rgb(160, 160, 15); box-shadow: 0px 0px 15px rgb(0, 140, 255);">
+    <nav class="navbar navbar-light bg-light py-0" style="border-bottom: 2px solid rgb(160, 160, 15); box-shadow: 0px 0px 15px rgb(0, 140, 255);">
       <div class="container-fluid d-flex align-items-center">
         <!-- Toggle Button -->
         <button class="btn btn-primary me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
@@ -123,15 +146,17 @@
       {% endblock %}
     </div>
 
+    <div class="circle-bottom-left"></div>
+    <div class="circle-center"></div>
     <!-- Footer -->
-    <footer class="footer mt-auto">
+    <!-- <footer class="footer mt-1">
       <div class="container">
         <p class="mb-0">© 2023 Rongo Voting System. All rights reserved.</p>
         <p class="mb-0">
           <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
         </p>
       </div>
-    </footer>
+    </footer> -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
