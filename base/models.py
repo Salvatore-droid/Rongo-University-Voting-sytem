@@ -2,13 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
-
-
-
 class School(models.Model):
     name = models.CharField(max_length=200, null=True)
-    registration_formats = models.TextField(help_text="Comma-separated registration number prefixes (e.g., CSC/,MAT/,AGR/)")
+    registration_formats = models.TextField()
 
     def __str__(self):
         return self.name
@@ -37,7 +33,7 @@ class Candidate(models.Model):
         return url
 
 # Position Model
-class Position(models.Model):
+class SchoolPosition(models.Model):
     name = models.CharField(max_length=200, null=True)
     candidates = models.ManyToManyField(Candidate, related_name='positions')  # Many-to-many relationship
 
@@ -57,7 +53,7 @@ class Voter(models.Model):
 # Vote Model (to track votes per position)
 class Vote(models.Model):
     voter = models.ForeignKey(Voter, on_delete=models.CASCADE, related_name='vote_set')
-    position = models.ForeignKey(Position, on_delete=models.CASCADE, null=True)
+    position = models.ForeignKey(SchoolPosition, on_delete=models.CASCADE, null=True)
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
